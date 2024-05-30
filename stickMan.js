@@ -43,17 +43,18 @@ const hill2BaseHeight = 70;
 const hill2Amplitude = 20;
 const hill2Stretch = 0.5;
 
-const stretchingSpeed = 4; // Milliseconds it takes to draw a pixel
-const turningSpeed = 4; // Milliseconds it takes to turn a degree
+const stretchingSpeed = 4;
+const turningSpeed = 4;
 const walkingSpeed = 4;
 const transitioningSpeed = 2;
 const fallingSpeed = 2;
 
-const heroWidth = 17; // 24
-const heroHeight = 30; // 40
+const heroWidth = 17;
+const heroHeight = 30;
 
 const canvas = document.getElementById("game");
-canvas.width = window.innerWidth; // Make the Canvas full screen
+// Đảm bảo canvas tràn màn hình
+canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const ctx = canvas.getContext("2d");
@@ -62,6 +63,7 @@ const introductionElement = document.getElementById("introduction");
 const perfectElement = document.getElementById("perfect");
 const restartButton = document.getElementById("restart");
 const scoreElement = document.getElementById("score");
+// Sound effects
 const backgroundMusic = document.getElementById("backgroundMusic");
 var stickGrowSound = new Audio("./audio/stick_grow_loop.wav");
 var keepPlayingStick = false;
@@ -97,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-
+// sound effect khi kéo dài stick
 function loopSound() {
     if (keepPlayingStick) {
         stickGrowSound.play();
@@ -116,10 +118,9 @@ function loopSound() {
             });
     }
 }
-// Initialize layout
+// Khởi tạo game
 resetGame();
 
-// Resets game variables and layouts but does not start the game (game starts on keypress)
 function resetGame() {
     // Reset game progress
     phase = "waiting";
@@ -131,7 +132,7 @@ function resetGame() {
     restartButton.style.display = "none";
     scoreElement.innerText = score;
 
-    // The first platform is always the same
+    // Khởi tạo vật ban đầu luôn giống nhau mọi trường hợp
     platforms = [{ x: 50, w: 50 }];
     generatePlatform();
     generatePlatform();
@@ -162,7 +163,7 @@ function generateTree() {
     const minimumGap = 30;
     const maximumGap = 150;
 
-    // X coordinate of the right edge of the furthest tree
+    // Tọa độ X của cây ra nhất
     const lastTree = trees[trees.length - 1];
     let furthestX = lastTree ? lastTree.x : 0;
 
@@ -183,7 +184,7 @@ function generatePlatform() {
     const minimumWidth = 20;
     const maximumWidth = 100;
 
-    // X coordinate of the right edge of the furthest platform
+    // Tọa độ X của vật cản xa nhất
     const lastPlatform = platforms[platforms.length - 1];
     let furthestX = lastPlatform.x + lastPlatform.w;
 
@@ -199,7 +200,7 @@ function generatePlatform() {
 }
 
 resetGame();
-// Space: reset game
+// Space: reset lại game
 window.addEventListener("keydown", function (event) {
     if (event.key == " ") {
         // Neu nguoi dung nhan khoang thang => reset game
@@ -299,7 +300,7 @@ function animate(timestamp) {
 
             const [nextPlatform] = thePlatformTheStickHits();
             if (nextPlatform) {
-                // If hero will reach another platform then limit it's position at it's edge
+                // nếu thành công đến vật cản tiếp theo, đặt ví trí HeroX ở rìa bên phải vật cản
                 const maxHeroX =
                     nextPlatform.x + nextPlatform.w - heroDistanceFromEdge;
                 if (heroX > maxHeroX) {
@@ -307,7 +308,7 @@ function animate(timestamp) {
                     phase = "transitioning";
                 }
             } else {
-                // If hero won't reach another platform then limit it's position at the end of the pole
+                // Nếu thất bại, đặt ví trí HeroX ra ngoài rìa của gậy
                 const maxHeroX =
                     sticks.last().x + sticks.last().length + heroWidth;
                 if (heroX > maxHeroX) {
@@ -357,7 +358,7 @@ function animate(timestamp) {
     lastTimestamp = timestamp;
 }
 
-// Returns the platform the stick hit (if it didn't hit any stick then return undefined)
+// Trả về vật cản mà thanh chạm đến, nếu không trả về undefined
 function thePlatformTheStickHits() {
     if (sticks.last().rotation != 90)
         throw Error(`Stick is ${sticks.last().rotation}°`);
@@ -391,7 +392,7 @@ function draw() {
 
     drawBackground();
 
-    // Center main canvas area to the middle of the screen
+    // Căn giữa canvas vào chính giữa màn hình
     ctx.translate(
         (window.innerWidth - canvasWidth) / 2 - sceneOffset,
         (window.innerHeight - canvasHeight) / 2
@@ -423,7 +424,7 @@ function drawPlatforms() {
             platformHeight + (window.innerHeight - canvasHeight) / 2
         );
 
-        // Draw perfect area only if hero did not yet reach the platform
+        // Tạo ví trị hoàn hảo => x2 điểm khi stick chạm đến
         if (sticks.last().x < x) {
             ctx.fillStyle = "red";
             ctx.fillRect(
@@ -535,7 +536,6 @@ function drawBackground() {
     trees.forEach((tree) => drawTree(tree.x, tree.color));
 }
 
-// A hill is a shape under a stretched out sinus wave
 function drawHill(baseHeight, amplitude, stretch, color) {
     ctx.beginPath();
     ctx.moveTo(0, window.innerHeight);
